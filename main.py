@@ -1,28 +1,43 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 
-import redis
-import json
-
 import schemas
-
-# Initialize Redis connection
-r = redis.Redis(host='localhost', port=6379, db=0)
+import asyncio
+import aioredis
 
 app = FastAPI()
 
 
+async def run_elevator_script(key):
+    try:
+        async with aioredis.from_url("redis://localhost") as r:
+            while True:
+                # Check if there's more than one floor in the elevator's queue
+                if await r.llen(key) > 1:
+                    # Pop the first floor from the queue
+                    await r.lpop(key)
+                await asyncio.sleep(5)  # Sleep for 5 seconds
+    except Exception as e:
+        print(f"Error running script for Elevator {key}: {e}")
+
+
 @app.post("/config/")
-def create_config(config: schemas.Config):
-    # clear redis
-    r.flushall()
-    # set the limits
-    r.set('elevator_limits', json.dumps(config.elevators))
-    # init x amount of elevators having [min_limit,]
-
-    # run scripts for each of those elevators that clear the front floor every x seconds and print msg
-
-    return HTMLResponse(status_code=201)
+async def create_config(config: schemas.Config):
+    try:
+        r = aioredis.from_url("redis://localhost")
+        # Clear Redis
+        await r.flushall()
+        # Init the elevators with the current floor being the lower range of the floors
+        for index, elevator_data in enumerate(config.elevators):
+            key = f'elevator_{index + 1}'
+            await r.rpush(key, *[elevator_data[0]])
+            # Set the elevator limits
+            await r.rpush(key + '_limits', *elevator_data)
+            # Run scripts for each of those elevators asynchronously, so they don't block the API
+            asyncio.create_task(run_elevator_script(key))
+        return HTMLResponse(status_code=201)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/elevators/", response_model=schemas.Response)
