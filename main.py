@@ -44,8 +44,13 @@ async def create_config(config: schemas.Config):
 def make_request(request: schemas.Request):
     print(request)
     # get current floor and floor to go
-    # get all elevators and see which one to is the best option
-    # add the floor to the queue
+    # Algo
+    # --- make sure only one client can access the algo at the same time
+    # --- See elevator limits and select the elevators that match the criteria
+    # --- For each elevator - extract floors and directions
+    # --- For each elevator - place temporarily the new floor where it belongs and calculate time to reach that floor
+    # --- Find the elevator that will get the quickest and insert that floor in the queue where it belongs
+    # return the floor and the direction to the client
     # return info
     return {"elevator_number": 3, "elevator_direction": 'down'}
 
