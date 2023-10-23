@@ -11,9 +11,8 @@ class Config(BaseModel):
 
 class Request(BaseModel):
     current_floor: int
-    floor_to_go: int
 
 
 class Response(BaseModel):
     elevator_number: int
-    elevator_direction: Literal['up', 'down', 'at floor']
+    elevator_direction: Literal['up', 'down', 'idle']
