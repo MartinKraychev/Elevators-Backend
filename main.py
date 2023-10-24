@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 
 import schemas
 from utils.config_utils import create_redis_config
-from utils.request_utils import handle_request
+from utils.request_utils import handle_floor_request, handle_elevators_request
 
 app = FastAPI()
 
@@ -17,15 +17,14 @@ async def create_config(config: schemas.Config):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/elevators/", response_model=schemas.Response)
-def make_request(request: schemas.Request):
-    handle_request(request)
-    return {"elevator_number": 3, "elevator_direction": 'down'}
+@app.post("/elevators/", response_model=schemas.ElevatorResponse)
+def make_floor_request(request: schemas.Request):
+    elevator_number, elevator_direction = handle_floor_request(request)
+    return {"elevator_number": elevator_number, "elevator_direction": elevator_direction}
 
 
 @app.get("/elevators/")
 def check_elevators_status():
-    # access all elevators and return their current floor and their direction
-    # get the direction by checking the next 2 floors in the queue
-    return {"elevator1": 3, "elevator2": 4}
+    elevator_floors, elevator_directions = handle_elevators_request()
+    return {"elevator_floors": elevator_floors, "elevator_directions": elevator_directions}
 

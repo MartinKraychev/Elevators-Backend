@@ -34,6 +34,6 @@ async def move_elevator_script(elevator):
                 if await r.llen(elevator) > 1:
                     # Pop the first floor from the queue
                     await r.lpop(elevator)
-                await asyncio.sleep(5)  # Sleep for 5 seconds
+                await asyncio.sleep(5)
     except Exception as e:
         print(f"Error running script for Elevator {elevator}: {e}")

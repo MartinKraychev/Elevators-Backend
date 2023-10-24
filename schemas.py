@@ -13,6 +13,11 @@ class Request(BaseModel):
     current_floor: int
 
 
-class Response(BaseModel):
+class ElevatorResponse(BaseModel):
     elevator_number: int
     elevator_direction: Literal['up', 'down', 'idle']
+
+
+class ElevatorStatuses(BaseModel):
+    elevator_floors: List
+    elevator_directions: List

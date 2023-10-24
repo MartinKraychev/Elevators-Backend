@@ -1,8 +1,21 @@
 import redis
 
+r = redis.Redis(host='localhost', port=6379, db=0)
 
-def handle_request(data):
-    elevators, available_elevators = extract_data(data)
+
+def handle_elevators_request():
+    elevators, _ = extract_data()
+    directions = []
+    current_floors = []
+    for el in elevators:
+        directions.append(get_elevator_direction(el))
+        current_floors.append(el[0])
+
+    return current_floors, directions
+
+
+def handle_floor_request(data):
+    elevators, available_elevators = extract_data(data.current_floor)
 
     inserted_floors = {}
 
@@ -10,17 +23,23 @@ def handle_request(data):
         planned_floors = elevators[index]
 
         if data.current_floor in planned_floors:
-            index = planned_floors.index(data.current_floor)
+            floor_index = planned_floors.index(data.current_floor)
         else:
             insert_user_floor(planned_floors, data.current_floor)
-            index = planned_floors.index(data.current_floor)
-        inserted_floors[elevators[index]] = (planned_floors, index)
+            floor_index = planned_floors.index(data.current_floor)
+        inserted_floors[index+1] = (planned_floors, floor_index)
 
-    print(inserted_floors)
+    sorted_inserted_floors = dict(sorted(inserted_floors.items(), key=lambda item: item[1][1]))
+    elevator_to_go = next(iter(sorted_inserted_floors.items()))
+    elevator_number = elevator_to_go[0]
+    key = f'elevator_{elevator_number}'
+    r.delete(key)
+    r.rpush(key, *elevator_to_go[1][0])
+    elevator_direction = get_elevator_direction(elevator_to_go[1][0])
+    return elevator_number, elevator_direction
 
 
-def extract_data(data):
-    r = redis.Redis(host='localhost', port=6379, db=0)
+def extract_data(current_floor=None):
     elevators_count = decode_element(r.get("elevators_count"))
     elevators = []
     elevator_limits = []
@@ -30,9 +49,11 @@ def extract_data(data):
         elevators.append([decode_element(floor)for floor in elevator])
         elevator_limit = r.lrange(f'elevator_{index + 1}_limits', 0, -1)
         elevator_limits.append([decode_element(limit) for limit in elevator_limit])
-    for index, elevator_limit in enumerate(elevator_limits):
-        if data.current_floor in inclusive_range(*elevator_limit):
-            available_elevator_indexes.append(index + 1)
+
+    if current_floor:
+        for index, elevator_limit in enumerate(elevator_limits):
+            if current_floor in inclusive_range(*elevator_limit):
+                available_elevator_indexes.append(index)
 
     return elevators, available_elevator_indexes
 
@@ -60,7 +81,10 @@ def insert_user_floor(planned_floors, user_floor):
         planned_floors.append(user_floor)
 
 
-
-
-# for elevator, (planned_floors, index) in inserted_floors.items():
-#     print(f"{elevator}: {planned_floors}, Inserted at index: {index}")
+def get_elevator_direction(planned_floors):
+    if len(planned_floors) == 1:
+        return 'idle'
+    elif planned_floors[0] > planned_floors[1]:
+        return 'down'
+    else:
+        return 'up'
