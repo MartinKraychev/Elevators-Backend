@@ -18,6 +18,7 @@ def handle_elevators_request():
     return current_floors, directions
 
 
+# ----------------------------------------------------------------------------------------------------------------------
 def handle_floor_request(data):
     """
     Handles user interaction with the elevator
@@ -53,6 +54,7 @@ def handle_floor_request(data):
     return elevator_number, elevator_direction
 
 
+# ----------------------------------------------------------------------------------------------------------------------
 def extract_data(current_floor=None):
     """
     Extracts the data from the database and if user floor is given, provide available elevator indexes
@@ -77,6 +79,7 @@ def extract_data(current_floor=None):
     return elevators, available_elevator_indexes
 
 
+# ----------------------------------------------------------------------------------------------------------------------
 def decode_int_element(element):
     """
     Takes an element from the Redis DB and parses it to integer
@@ -86,6 +89,7 @@ def decode_int_element(element):
     return int(element.decode("utf-8"))
 
 
+# ----------------------------------------------------------------------------------------------------------------------
 def inclusive_range(start, end):
     """
     Utils functions to create a inclusive range
@@ -96,6 +100,7 @@ def inclusive_range(start, end):
     return range(start, end+1)
 
 
+# ----------------------------------------------------------------------------------------------------------------------
 def insert_user_floor(planned_floors, user_floor):
     """
     Inserts a user floor into the planned floors
@@ -119,6 +124,7 @@ def insert_user_floor(planned_floors, user_floor):
         planned_floors.append(user_floor)
 
 
+# ----------------------------------------------------------------------------------------------------------------------
 def get_elevator_direction(planned_floors):
     """
     Gets the elevator direction based on the first 2 floors in the queue

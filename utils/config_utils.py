@@ -22,6 +22,7 @@ async def create_redis_config(elevators_config):
         asyncio.create_task(move_elevator_script(key))
 
 
+# ----------------------------------------------------------------------------------------------------------------------
 async def move_elevator_script(elevator):
     """
     Async Script running with each elevator. It removes the current floor from the front of the queue every 5 seconds
