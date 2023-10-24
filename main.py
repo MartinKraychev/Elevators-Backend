@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
-
 import schemas
+
 from utils.config_utils import create_redis_config
 from utils.request_utils import handle_floor_request, handle_elevators_request
 
