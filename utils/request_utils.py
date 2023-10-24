@@ -26,11 +26,11 @@ def handle_floor_request(data):
     :return: Elevator number to take ,and it's direction
     """
     # Get the data from the database
-    elevators, available_elevators = extract_data(data.current_floor)
+    elevators, available_elevators_indexes = extract_data(data.current_floor)
 
     inserted_floors = {}
     # For each elevator insert the user floor where it belongs and create an index of proximity
-    for index in available_elevators:
+    for index in available_elevators_indexes:
         planned_floors = elevators[index]
 
         if data.current_floor in planned_floors:
@@ -40,7 +40,7 @@ def handle_floor_request(data):
             floor_index = planned_floors.index(data.current_floor)
         inserted_floors[index+1] = (planned_floors, floor_index)
 
-    # Sort the inserted floors by the index of proximity and get the first one(closest one)
+    # Sort the inserted floors by the index of proximity and get the first one(the closest one)
     sorted_inserted_floors = dict(sorted(inserted_floors.items(), key=lambda item: item[1][1]))
     elevator_to_go = next(iter(sorted_inserted_floors.items()))
     # Replace the data for this elevator in the DB

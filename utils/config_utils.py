@@ -2,6 +2,9 @@ import asyncio
 import aioredis
 
 
+TIME_TO_MOVE_BETWEEN_FLOORS = 10
+
+
 async def create_redis_config(elevators_config):
     """
     Creates the initial redis config
@@ -35,6 +38,6 @@ async def move_elevator_script(elevator):
                 if await r.llen(elevator) > 1:
                     # Pop the first floor from the queue
                     await r.lpop(elevator)
-                await asyncio.sleep(5)
+                await asyncio.sleep(TIME_TO_MOVE_BETWEEN_FLOORS)
     except Exception as e:
         print(f"Error running script for Elevator {elevator}: {e}")
