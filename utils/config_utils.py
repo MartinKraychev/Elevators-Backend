@@ -17,8 +17,8 @@ async def create_redis_config(elevators_config):
     await r.flushall()
     # Set the count, the initial state and the limits for each elevator
     await r.set('elevators_count', len(elevators_config))
-    for index, elevator_data in enumerate(elevators_config):
-        key = f'elevator_{index + 1}'
+    for index, elevator_data in elevators_config.items():
+        key = f'elevator_{index}'
         await r.rpush(key, *[elevator_data[0]])
         await r.rpush(key + '_limits', *elevator_data)
         # Run scripts for each of those elevators asynchronously, so they don't block the API

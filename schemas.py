@@ -3,7 +3,7 @@ from typing import List, Literal
 
 
 class Config(BaseModel):
-    elevators: List
+    elevators: dict
 
     class Config:
         arbitrary_types_allowed = True
@@ -22,5 +22,4 @@ class ElevatorResponse(BaseModel):
 
 # ----------------------------------------------------------------------------------------------------------------------
 class ElevatorStatuses(BaseModel):
-    elevator_floors: List
-    elevator_directions: List
+    elevators_info: List

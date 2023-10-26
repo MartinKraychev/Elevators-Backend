@@ -6,16 +6,14 @@ r = redis.Redis(host='localhost', port=6379, db=0)
 def handle_elevators_request():
     """
     Handles the elevator statuses requests
-    :return: Elevator's current floors and their direction
+    :return: Elevators and their info
     """
     elevators, _ = extract_data()
-    directions = []
-    current_floors = []
+    elevators_info = []
     for el in elevators:
-        directions.append(get_elevator_direction(el))
-        current_floors.append(el[0])
+        elevators_info.append([el[0], get_elevator_direction(el)])
 
-    return current_floors, directions
+    return elevators_info
 
 
 # ----------------------------------------------------------------------------------------------------------------------

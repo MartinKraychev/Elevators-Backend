@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 import schemas
 from utils.config_utils import create_redis_config
@@ -8,9 +9,20 @@ from utils.request_utils import handle_floor_request, handle_elevators_request
 import threading
 
 app = FastAPI()
+# Configure CORS
+origins = ["http://localhost:3000"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Create a mutex (lock)
 db_mutex = threading.Lock()
+
 
 @app.post("/config/")
 async def create_config(config: schemas.Config):
@@ -32,8 +44,8 @@ def make_floor_request(request: schemas.Request):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-@app.get("/elevators/")
+@app.get("/elevators/", response_model=schemas.ElevatorStatuses)
 def check_elevators_status():
-    elevator_floors, elevator_directions = handle_elevators_request()
-    return {"elevator_floors": elevator_floors, "elevator_directions": elevator_directions}
+    elevators_info = handle_elevators_request()
+    return {"elevators_info": elevators_info}
 
