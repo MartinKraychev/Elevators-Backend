@@ -12,7 +12,7 @@ async def create_redis_config(elevators_config):
     :return:
     """
     # Connect to Redis
-    r = aioredis.from_url("redis://localhost")
+    r = aioredis.from_url("redis://:Pf5h6w5E4YqbIT0jj4Lk24tSH5nBNWDs@redis-15451.c242.eu-west-1-2.ec2.cloud.redislabs.com:15451")
     # Clear Redis
     await r.flushall()
     # Set the count, the initial state and the limits for each elevator
@@ -32,7 +32,7 @@ async def move_elevator_script(elevator):
     :param elevator: The current elevator
     """
     try:
-        async with aioredis.from_url("redis://localhost") as r:
+        async with aioredis.from_url("redis://:Pf5h6w5E4YqbIT0jj4Lk24tSH5nBNWDs@redis-15451.c242.eu-west-1-2.ec2.cloud.redislabs.com:15451") as r:
             while True:
                 # Check if there's more than one floor in the elevator's queue
                 if await r.llen(elevator) > 1:

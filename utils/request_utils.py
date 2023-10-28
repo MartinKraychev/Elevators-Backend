@@ -1,6 +1,9 @@
 import redis
 
-r = redis.Redis(host='localhost', port=6379, db=0)
+r = redis.Redis(
+  host='redis-15451.c242.eu-west-1-2.ec2.cloud.redislabs.com',
+  port=15451,
+  password='Pf5h6w5E4YqbIT0jj4Lk24tSH5nBNWDs')
 
 
 def handle_elevators_request():
