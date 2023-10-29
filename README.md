@@ -6,6 +6,8 @@ In the current system, each elevator is represented as a list (or queue) within 
 
 It's important to note that item dequeuing only occurs when there's more than one floor in the queue. To maintain data integrity, we've implemented a threading lock mechanism to ensure that only one user can manipulate the data stored in Redis at any given time.
 
+This backend service works with the following client https://github.com/MartinKraychev/Elevators-Frontend and that needs to be set up as well.
+
 ## Configuration and start up
 
 Clone the project
