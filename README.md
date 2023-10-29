@@ -56,6 +56,7 @@ Response is 201 Created
 ```
 
 The body is "current_floor": int -> from 1 to 9 which are the limits
+
 Response is {"elevator_number": int, "elevator_direction": str}
 
 #### Get the statuses of each elevator
