@@ -38,14 +38,20 @@ async def create_config(config: schemas.Config):
 def make_floor_request(request: schemas.Request):
     # We lock handling the request to avoid multiple users
     # attempting to update the same entry in the DB at the same time
-    with db_mutex:
-        elevator_number, elevator_direction = handle_floor_request(request)
-    return {"elevator_number": elevator_number, "elevator_direction": elevator_direction}
+    try:
+        with db_mutex:
+            elevator_number, elevator_direction = handle_floor_request(request)
+        return {"elevator_number": elevator_number, "elevator_direction": elevator_direction}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 @app.get("/elevators/", response_model=schemas.ElevatorStatuses)
 def check_elevators_status():
-    elevators_info = handle_elevators_request()
-    return {"elevators_info": elevators_info}
+    try:
+        elevators_info = handle_elevators_request()
+        return {"elevators_info": elevators_info}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
