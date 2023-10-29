@@ -3,6 +3,7 @@ import aioredis
 
 
 TIME_TO_MOVE_BETWEEN_FLOORS = 10
+TIME_TO_WAIT_BEFORE_NEXT_CHECK = 1
 
 
 async def create_redis_config(elevators_config):
@@ -36,8 +37,12 @@ async def move_elevator_script(elevator):
             while True:
                 # Check if there's more than one floor in the elevator's queue
                 if await r.llen(elevator) > 1:
-                    # Pop the first floor from the queue
+                    # wait for 10 seconds and pop the first floor from the queue
+                    await asyncio.sleep(TIME_TO_MOVE_BETWEEN_FLOORS)
                     await r.lpop(elevator)
-                await asyncio.sleep(TIME_TO_MOVE_BETWEEN_FLOORS)
+                else:
+                    # Sleep for 1 second before checking again
+                    await asyncio.sleep(TIME_TO_WAIT_BEFORE_NEXT_CHECK)
+
     except Exception as e:
         print(f"Error running script for Elevator {elevator}: {e}")
